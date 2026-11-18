@@ -1,0 +1,584 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>학과 업로드 | 교육과정표 사전검증</title><link rel="icon" href="https://www.seojeong.ac.kr/_res/seojeong/_share/img/sj_symbol.png"><script src="api.js"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM&#43;Plex&#43;Sans&#43;KR:wght@400;500;600;700&amp;family=IBM&#43;Plex&#43;Mono:wght@500&amp;display=swap">
+<style>
+ 
+:root{
+  --ink:#1B2233;--ink-2:#434C5E;--muted:#5B6578;
+  --line:#DCE1E8;--line-2:#BFC7D3;
+  --paper:#FFFFFF;--page:#EEF1F5;--sheet-soft:#F5F7FA;--grid-line:rgba(27,34,51,.055);
+  --brand:#2438B5;--brand-2:#182A94;--brand-soft:#E8EBFA;
+  --ok:#0F7B55;--ok-soft:#E9F6F0;--ok-line:#B6DFCD;
+  --bad:#C42B3A;--bad-soft:#FDEFF0;--bad-line:#F0C2C7;
+  --warn:#8F5A06;--warn-soft:#FFF6E3;--warn-line:#E8CD94;
+  --r:6px;--page-w:1480px;
+  --ease:cubic-bezier(.2,.8,.2,1);--spring:cubic-bezier(.34,1.45,.64,1);
+  --font:"IBM Plex Sans KR",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Malgun Gothic",monospace;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;color:var(--ink);font:400 15px/1.6 var(--font);word-break:keep-all;overflow-wrap:break-word;font-variant-numeric:tabular-nums;
+  background-color:var(--page);
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:28px 28px}
+button,input,select{font:inherit}
+
+ 
+header{position:sticky;top:0;z-index:20;height:60px;background:var(--paper);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 max(calc((100vw - var(--page-w))/2 + 24px),24px)}
+.brand{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--ink);white-space:nowrap}
+.brand span{color:var(--brand)}
+.brand-mark{width:24px;height:24px;flex:none}
+.brand-mark rect{fill:none;stroke:currentColor;stroke-width:1.6}
+.brand-mark .on{fill:var(--ok);stroke:var(--ok)}
+nav{display:flex;align-items:center;gap:4px}
+nav a{color:var(--ink-2);text-decoration:none;padding:8px 12px;border-radius:var(--r);font-weight:500;font-size:14px;white-space:nowrap;transition:background-color .15s,color .15s}
+nav a:hover{background:rgba(27,34,51,.06);color:var(--ink)}
+nav a.active{color:var(--brand);background:var(--brand-soft);font-weight:600}
+ 
+body:has(nav a.active[href*="page=upload"]) nav a[href*="page=admin"]{display:none!important}
+ 
+body.admin header{background:var(--ink);border-bottom-color:var(--ink)}
+body.admin .brand{color:#fff}
+body.admin .brand span{color:#A9B6FF}
+body.admin .brand-mark .on{fill:#3CC596;stroke:#3CC596}
+body.admin nav a{color:#C6CDDC}
+body.admin nav a:hover{background:rgba(255,255,255,.1);color:#fff}
+body.admin nav a.active{background:rgba(255,255,255,.16);color:#fff}
+
+ 
+main{max-width:var(--page-w);margin:28px auto 48px;padding:0 24px}
+.stack>*+*{margin-top:16px}
+.pagehead{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px 32px;margin-bottom:20px}
+h1{margin:0;font-size:28px;line-height:1.3;letter-spacing:-.03em;font-weight:700}
+h2{margin:0;font-size:18px;line-height:1.4;letter-spacing:-.02em;font-weight:600}
+h3{margin:28px 0 8px;font-size:15px;line-height:1.5;font-weight:600}
+.lead{margin:6px 0 0;max-width:62ch;color:var(--ink-2);font-size:15px}
+.hint{margin:4px 0 16px;color:var(--muted);font-size:14px;line-height:1.6}
+.small{font-size:12.5px;line-height:1.6}
+.muted{color:var(--muted)}
+.green{color:var(--ok)}.red{color:var(--bad)}.amber{color:var(--warn)}
+.hidden{display:none!important}
+.mono{font-family:var(--mono);font-size:13px}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:24px}
+.sec-head{margin-bottom:4px}
+.sec-head .hint{margin-bottom:0}
+.source-status{display:flex;align-items:center;gap:8px;margin:0;max-width:560px;padding:8px 12px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);font-size:13px;line-height:1.5;color:var(--ink-2)}
+.source-status::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--brand)}
+footer{margin:40px 0 8px;text-align:center;color:var(--muted);font-size:12.5px}
+
+ 
+label{display:block;margin:16px 0;font-size:14px;line-height:1.5;font-weight:500;color:var(--ink-2)}
+label input:not([type=file]):not([type=checkbox]){display:block;width:100%;margin-top:6px}
+input[type=text],input[type=number],input:not([type]),select,label input:not([type=file]):not([type=checkbox]){min-height:40px;padding:8px 12px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--paper);color:var(--ink)}
+select{padding-right:28px}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--brand);cursor:pointer}
+input[readonly]{background:var(--sheet-soft)!important;color:var(--muted)!important}
+input:focus-visible,select:focus-visible{outline:2px solid var(--brand);outline-offset:0;border-color:var(--brand)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+ 
+.primary,.secondary,.tiny{min-height:38px;padding:7px 16px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--paper);color:var(--ink);font-weight:500;cursor:pointer;transition:background-color .15s,border-color .15s,color .15s}
+.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+.primary:hover:not(:disabled){background:var(--brand-2);border-color:var(--brand-2)}
+.secondary:hover:not(:disabled),.tiny:hover:not(:disabled){background:var(--sheet-soft);border-color:var(--ink-2)}
+.primary:disabled,.secondary:disabled,.tiny:disabled{opacity:.4;cursor:not-allowed}
+.tiny{min-height:30px;padding:3px 10px;font-size:13px}
+.wide{width:100%;min-height:44px;margin-top:8px}
+.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+
+ 
+.drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:150px;margin:0;padding:24px;border:1.5px dashed var(--line-2);border-radius:var(--r);text-align:center;color:var(--ink);cursor:pointer;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:20px 20px;background-position:-1px -1px;
+  transition:border-color .2s,background-color .2s}
+.drop:hover{border-color:var(--brand)}
+.drop b{font-weight:600}
+.drop small{color:var(--muted);font-size:13px;font-weight:400}
+.drop-btn{margin-top:6px;padding:6px 14px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--paper);font-size:13.5px;font-weight:500}
+.drop input[type=file]{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.drop:focus-within{outline:2px solid var(--brand);outline-offset:2px}
+.filepill{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:10px 14px;background:var(--sheet-soft);border:1px solid var(--line);border-radius:var(--r);font-size:14px}
+.filepill span{color:var(--muted);font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+.intake{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:40px;align-items:start}
+.intake .hint{margin-bottom:14px}
+.intake-side label{margin-top:0}
+.submit-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(180px,1fr) minmax(180px,1fr) minmax(240px,1fr);gap:20px 24px;align-items:end}
+.submit-grid label{margin:0}
+.submit-grid .hint{margin-bottom:0}
+.submit-grid button{margin-top:0}
+
+ 
+.verdicts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 40px;margin:20px 0 4px}
+.verdict-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+.verdict-head b{font-weight:600}
+.vbar{display:flex;gap:2px;height:14px;border-radius:3px;overflow:hidden;background:var(--line)}
+.vbar i{display:block;min-width:4px}
+.vbar .ok{background:var(--ok)}.vbar .bad{background:var(--bad)}.vbar .warn{background:#C98A1B}
+.vlegend{display:flex;flex-wrap:wrap;gap:4px 22px;margin:10px 0 0;padding:0;list-style:none;font-size:13.5px;color:var(--ink-2)}
+.vlegend b{margin-right:5px;font-size:22px;font-weight:700;letter-spacing:-.02em}
+.vlegend .ok b{color:var(--ok)}.vlegend .bad b{color:var(--bad)}.vlegend .warn b{color:var(--warn)}
+.vlegend .zero{opacity:.55}
+.info{margin:16px 0;padding:10px 14px;border-left:3px solid var(--brand);border-radius:0 var(--r) var(--r) 0;background:var(--brand-soft);color:var(--ink-2);font-size:13.5px;line-height:1.7}
+.info strong{margin-right:6px;color:var(--ink);font-weight:600}
+.alert{margin:16px 0;padding:12px 14px;border:1px solid var(--warn-line);border-radius:var(--r);background:var(--warn-soft);color:var(--warn);font-size:14px;line-height:1.6}
+.report-card:has(#report:empty){display:none}
+#sheetPreview:empty{display:none}
+
+ 
+.tablewrap{overflow:auto;max-height:460px;margin-top:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--paper)}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;white-space:nowrap}
+th{position:sticky;top:0;z-index:1;background:var(--sheet-soft);color:var(--ink-2);font-size:13px;font-weight:600;text-align:left}
+td,th{padding:10px 14px;border-bottom:1px solid var(--line)}
+tbody tr:hover td{background:#F8F9FC}
+tr:last-child td{border-bottom:0}
+td .small{margin-top:2px;white-space:normal}
+.location-link{padding:0;border:0;background:transparent;color:var(--brand);font-family:var(--mono);font-size:13px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border:1px solid transparent;border-radius:4px;font-size:12.5px;line-height:1.6;font-weight:500}
+.badge::before{content:"";width:6px;height:6px;margin-right:6px;border-radius:50%;background:currentColor}
+.badge.ok{background:var(--ok-soft);color:var(--ok);border-color:var(--ok-line)}
+.badge.bad{background:var(--bad-soft);color:var(--bad);border-color:var(--bad-line)}
+.badge.warn{background:var(--warn-soft);color:var(--warn);border-color:var(--warn-line)}
+
+ 
+.preview-card h2{margin-bottom:4px}
+.preview-note{margin:4px 0 12px;color:var(--muted);font-size:13.5px}
+.preview-fidelity-note{margin:8px 0;padding:8px 12px;border-left:3px solid var(--line-2);background:var(--sheet-soft);color:var(--muted);font-size:12.5px}
+.preview-legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:10px 0;color:var(--ink-2);font-size:13px}
+.legend-chip{display:inline-flex;align-items:center;gap:6px}
+.legend-dot{display:inline-block;width:12px;height:12px;border-radius:2px}
+.dot-match{background:rgba(15,123,85,.2);box-shadow:inset 0 0 0 2px var(--ok)}
+.dot-issue{background:rgba(196,43,58,.2);box-shadow:inset 0 0 0 2px var(--bad)}
+.preview-tabs{display:flex;gap:4px;margin:12px 0 0;overflow-x:auto;border-bottom:1px solid var(--line-2)}
+.preview-tab{margin-bottom:-1px;padding:8px 14px;border:1px solid transparent;border-bottom:0;border-radius:var(--r) var(--r) 0 0;background:transparent;color:var(--ink-2);font-size:13.5px;font-weight:500;white-space:nowrap;cursor:pointer}
+.preview-tab:hover{background:var(--sheet-soft)}
+.preview-tab.active{border-color:var(--line-2);background:var(--paper);color:var(--brand);font-weight:600;box-shadow:inset 0 3px 0 var(--brand)}
+.preview-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0 6px;color:var(--muted);font-size:13px}
+.preview-pages{display:flex;gap:6px}
+.preview-pages button,.preview-zoom-controls button{padding:4px 10px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--paper);color:var(--ink);font-size:13px;cursor:pointer}
+.preview-pages button:hover:not(:disabled),.preview-zoom-controls button:hover{background:var(--sheet-soft)}
+.preview-pages button:disabled{opacity:.4;cursor:not-allowed}
+.preview-zoom-controls{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px;margin:4px 0 10px;color:var(--muted);font-size:13px}
+.preview-zoom-controls output{min-width:48px;text-align:center;color:var(--ink);font-weight:600}
+.preview-zoom-controls .zoom-fit{border-color:var(--brand);color:var(--brand)}
+.curriculum-wrap{overflow:auto;max-height:620px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--paper)}
+.excel-preview-table{width:max-content;min-width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;white-space:pre-wrap}
+.excel-preview-table th{position:sticky;top:0;z-index:2;padding:6px 7px;border:1px solid #D5DBE4;background:#EEF1F6;color:var(--ink-2);font-size:12px;font-weight:600;text-align:center}
+.excel-preview-table td{min-width:36px;max-width:320px;padding:4px 6px;border:1px solid #D5DBE4;line-height:1.25;white-space:pre-wrap;overflow-wrap:anywhere}
+.excel-preview-table .row-num{position:sticky;left:0;z-index:3;width:36px;min-width:36px;background:#EEF1F6;color:var(--muted);text-align:right}
+.excel-preview-table th.row-num{z-index:4}
+.excel-preview-table th.col-code{background:#E2E7F6;color:var(--brand-2)}
+.excel-preview-table tr.row-match td.row-num{background:var(--ok-soft);color:var(--ok);font-weight:700}
+.excel-preview-table tr.row-issue td.row-num,.excel-preview-table tr.row-position-issue td.row-num{background:var(--bad-soft);color:var(--bad);font-weight:700}
+.excel-preview-table td.cell-match{background-image:linear-gradient(rgba(15,123,85,.2),rgba(15,123,85,.2))!important;box-shadow:inset 0 0 0 2px var(--ok)!important}
+.excel-preview-table td.cell-issue,.excel-preview-table td.cell-position-issue{background-image:linear-gradient(rgba(196,43,58,.2),rgba(196,43,58,.2))!important;box-shadow:inset 0 0 0 2px var(--bad)!important}
+.excel-preview-table td.cell-position-missing{background-image:linear-gradient(rgba(201,138,27,.2),rgba(201,138,27,.2))!important;box-shadow:inset 0 0 0 2px #C98A1B!important}
+
+ 
+.success-box{margin-top:20px;padding:16px 18px;border:1px solid var(--ok-line);border-radius:var(--r);background:var(--ok-soft)}
+.success-box h2{color:var(--ok);font-size:16px}
+.success-box p{margin:6px 0 0}
+
+ 
+.adminlayout{display:block}
+.side{display:flex;gap:2px;margin-bottom:16px;overflow-x:auto;border-bottom:1px solid var(--line-2)}
+.sidebtn{margin-bottom:-1px;padding:12px 18px;border:0;border-bottom:3px solid transparent;background:transparent;color:var(--ink-2);font-weight:500;white-space:nowrap;cursor:pointer}
+.sidebtn:hover{background:rgba(27,34,51,.05);color:var(--ink)}
+.sidebtn.selected{border-bottom-color:var(--brand);color:var(--brand);font-weight:600}
+.view{min-width:0}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.toolbar .hint{margin-bottom:0}
+.inline{display:flex;gap:8px}
+.inline input{min-height:38px}
+.stats{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:16px 0;border:1px solid var(--line);border-radius:var(--r);background:var(--paper)}
+.stats>div:not(.alert){padding:16px 22px;border-left:1px solid var(--line)}
+.stats>div:not(.alert):first-child{border-left:0}
+.stats>.alert{grid-column:1/-1;margin:0}
+.stats b{display:block;font-size:28px;line-height:1.3;letter-spacing:-.02em;font-weight:700}
+.stats small{color:var(--muted);font-size:13px}
+.detail{margin-top:20px;padding:18px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--sheet-soft)}
+.detail h3{margin-top:0}
+.detail .stats{background:var(--paper)}
+.empty{padding:36px;text-align:center;color:var(--muted)}
+td input[type=number]{min-height:34px;padding:4px 8px}
+td select{min-height:34px;padding:4px 8px}
+
+ 
+.toast{position:fixed;left:50%;bottom:20px;z-index:99;padding:10px 16px;border-radius:var(--r);background:var(--ink);color:#fff;font-size:14px;opacity:0;pointer-events:none;transform:translateX(-50%);transition:opacity .15s}
+.toast.show{opacity:1}
+
+ 
+.ux,.ux *,.ux *::before,.ux *::after{box-sizing:border-box}
+.ux :focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+
+ 
+.u042-steps{position:relative;display:flex;justify-content:space-between;max-width:520px;margin:0 0 20px;padding:0 30px;list-style:none}
+.u042-line{position:absolute;left:45px;right:45px;top:14px;height:3px;border-radius:2px;background:var(--line)}
+.u042-line i{position:absolute;inset:0;border-radius:inherit;background:var(--brand);transform-origin:0 50%;transform:scaleX(var(--p,0));transition:transform .6s var(--ease)}
+.u042-st{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;width:30px}
+.u042-dot{position:relative;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--paper);box-shadow:inset 0 0 0 2px var(--line-2);color:var(--muted);font-size:13px;font-weight:700;transition:box-shadow .35s,background-color .35s,color .35s,transform .45s var(--spring)}
+.u042-dot svg{position:absolute;width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.u042-dot path{stroke-dasharray:16;stroke-dashoffset:16;transition:stroke-dashoffset .35s var(--ease) .1s}
+.u042-st.cur .u042-dot{box-shadow:inset 0 0 0 2px var(--brand),0 0 0 4px var(--brand-soft);color:var(--brand);transform:scale(1.06)}
+.u042-st.done .u042-dot{background:var(--brand);box-shadow:none;color:#fff}
+.u042-st.done .u042-dot span{opacity:0}
+.u042-st.done .u042-dot svg{opacity:1}
+.u042-st.done .u042-dot path{stroke-dashoffset:0}
+.u042-st small{color:var(--muted);font-size:13px;font-weight:600;white-space:nowrap;transition:color .3s}
+.u042-st.cur small,.u042-st.done small{color:var(--ink)}
+
+ 
+.u032-zone{border:0!important;transition:transform .5s var(--spring),background-color .3s var(--ease)}
+.u032-dash{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.u032-dash rect{fill:none;stroke:var(--line-2);stroke-width:1.5;stroke-dasharray:8 7;transition:stroke .3s var(--ease)}
+.u032-zone:hover .u032-dash rect,.u032-zone.is-over .u032-dash rect{stroke:var(--brand);animation:u032-march .9s linear infinite}
+@keyframes u032-march{to{stroke-dashoffset:-30}}
+.u032-zone.is-over{transform:scale(1.01);background-color:color-mix(in srgb,var(--brand) 7%,#fff)}
+.u032-orb{display:grid;place-items:center;width:48px;height:48px;border-radius:12px;background:var(--brand);color:#fff;transition:transform .5s var(--spring)}
+.u032-orb svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u032-zone:hover .u032-orb{transform:translateY(-4px)}
+.u032-zone.is-over .u032-orb{transform:translateY(-6px) scale(1.08) rotate(-6deg)}
+
+ 
+.u244-sb{display:none;margin:0 0 14px;padding:11px 13px;border-radius:var(--r);background:var(--bad-soft);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--bad) 35%,transparent)}
+.u244-sb.is-on{display:block;animation:u244-in .35s var(--ease)}
+@keyframes u244-in{from{opacity:0;transform:translateY(-6px)}}
+.u244-sb b{display:block;color:var(--bad);font-size:14px;font-weight:600}
+.u244-sb ul{margin:6px 0 0;padding-left:20px;color:var(--bad);font-size:13.5px}
+.u244-sb a{color:var(--bad);text-underline-offset:2px}
+.u244-fd.is-bad input:not([type=file]){border-color:var(--bad);box-shadow:0 0 0 1px var(--bad)}
+.u244-ms{display:none;margin-top:4px;color:var(--bad);font-size:12.5px;line-height:1.5}
+.u244-fd.is-bad .u244-ms{display:block}
+.u244-shake{animation:u244-sh .4s}
+@keyframes u244-sh{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+
+ 
+.u250-br{position:fixed;left:50%;bottom:16px;z-index:40;display:flex;align-items:center;gap:8px;width:min(720px,calc(100vw - 32px));height:52px;padding:0 8px 0 16px;border-radius:var(--r);background:var(--ink);color:#fff;font-size:14px;font-weight:600;box-shadow:0 12px 28px -12px rgba(27,34,51,.55);transform:translate(-50%,calc(100% + 40px));transition:transform .45s cubic-bezier(.3,1.3,.5,1),background-color .3s}
+.u250-br.is-on{transform:translate(-50%,0)}
+.u250-br.is-warn{background:var(--bad)}
+.u250-br span{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.u250-br button{height:36px;padding:0 14px;border:0;border-radius:var(--r);font-size:13.5px;font-weight:600;cursor:pointer}
+.u250-br .u250-cx{background:rgba(255,255,255,.16);color:#fff}
+.u250-br .u250-sv{background:#fff;color:var(--ink)}
+.u250-br .u250-sv:disabled{opacity:.45;cursor:not-allowed}
+body:has(#reviewBar.is-on) main{padding-bottom:96px}
+body:has(#reviewBar.is-on) .toast{bottom:84px}
+
+ 
+@media(max-width:900px){
+  .intake,.verdicts{grid-template-columns:1fr}
+  .intake{gap:24px}
+  .submit-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:800px){
+  header{height:54px;padding:0 16px}
+  nav a{padding:7px 9px;font-size:13px}
+  .brand{font-size:15px}
+  main{margin:20px auto 40px;padding:0 16px}
+  h1{font-size:23px}
+  h2{font-size:17px}
+  .card{padding:18px}
+  .toolbar{flex-direction:column;align-items:flex-start}
+  .inline{width:100%}.inline input{flex:1}
+  .stats{grid-auto-flow:row;grid-template-columns:1fr 1fr}
+  .stats>div:not(.alert){border-left:0;border-top:1px solid var(--line)}
+  .stats>div:not(.alert):nth-child(-n+2){border-top:0}
+  .submit-grid{grid-template-columns:1fr}
+}
+ 
+:root{--ink:#2b3640;--ink-2:#434c56;--muted:#6b7680;--line:#dde1e5;--line-2:#c3cad1;--page:#eef0f2;--sheet-soft:#f4f6f8;--grid-line:transparent;--brand:#2f87b6;--brand-2:#25709a;--brand-soft:#e5f2f9;--r:2px;--page-w:1500px;--font:"Malgun Gothic","맑은 고딕","Noto Sans KR","Apple SD Gothic Neo",sans-serif;--navy:#222c35;--navy-2:#1a232b;--topbar:#2f87b6}
+body{background-image:none;padding-left:200px;font-size:14px}
+header,body.admin header{height:48px;background:var(--topbar);border-bottom:0;box-shadow:0 1px 3px rgba(0,0,0,.25);padding:0 20px 0 216px;color:#fff}
+header::before{content:"교육과정표 사전검증";font-size:14px;font-weight:700;color:#fff}
+body.admin header::before{content:"부서 모니터링·관리"}
+header::after{content:"학사관리시스템 · 교육과정";font-size:12.5px;color:#dcecf5}
+.brand,body.admin .brand{position:fixed;left:0;top:0;z-index:30;width:200px;height:48px;justify-content:center;gap:0;background:#2a79a3;color:#fff}
+.brand div{font-size:0}
+.brand div::before{content:"서정대학교";font-size:19px;font-weight:700;letter-spacing:.04em;color:#fff}
+.brand-mark{display:none}
+nav{position:fixed;left:0;top:48px;bottom:0;z-index:25;width:200px;flex-direction:column;align-items:stretch;gap:0;background:var(--navy);overflow-y:auto}
+nav::before{content:"교육과정 사전검증";display:block;padding:11px 16px;background:var(--navy-2);color:#8fa3b3;font-size:12px;font-weight:700;letter-spacing:.04em}
+nav a,body.admin nav a{padding:13px 16px 13px 18px;border-radius:0;border-left:3px solid transparent;color:#cfd9e1;font-size:14px;font-weight:500}
+nav a:hover,body.admin nav a:hover{background:#2c3944;color:#fff}
+nav a.active,body.admin nav a.active{background:#2f4152;border-left-color:#3fb0e8;color:#fff;font-weight:700}
+main{max-width:var(--page-w);margin:18px auto 48px;padding:0 24px}
+.pagehead{align-items:center;padding:12px 18px;background:#e6e9ec;border-left:4px solid var(--brand);margin-bottom:16px}
+h1{font-size:20px;letter-spacing:-.02em}
+.lead{margin:2px 0 0;font-size:13.5px;max-width:none}
+.hint{font-size:13px}
+.card{border-radius:2px;border-color:#d3d8dd;box-shadow:0 1px 2px rgba(0,0,0,.04);padding:20px 22px}
+.card h2{padding-left:10px;border-left:4px solid var(--brand);font-size:16px;line-height:1.25;font-weight:700}
+.success-box h2{padding-left:0;border-left:0}
+.info{border-radius:0}
+.source-status{border-radius:2px;background:#fff}
+.primary{background:var(--brand);border-color:var(--brand)}
+.primary,.secondary,.tiny{border-radius:2px}
+.secondary{border-color:var(--brand);color:var(--brand)}
+.secondary:hover:not(:disabled){background:var(--brand-soft);border-color:var(--brand-2)}
+.tablewrap{border-radius:0;border-color:#d3d8dd}
+.tablewrap th{background:#f1f3f5;color:#333;border-top:2px solid var(--brand);border-bottom:1px solid #cfd5da;font-weight:700}
+tbody tr:hover td{background:#eef6fb}
+.u032-orb{border-radius:50%}
+.side{gap:3px;border-bottom:2px solid var(--brand);margin-bottom:14px}
+.sidebtn{margin-bottom:0;padding:9px 22px;border:1px solid #cfd5da;border-bottom:0;border-radius:2px 2px 0 0;background:#eceff2;color:#434c56}
+.sidebtn:hover{background:#e0e6ea}
+.sidebtn.selected{background:var(--brand);border-color:var(--brand);color:#fff}
+.stats{gap:14px;border:0;background:transparent;border-radius:0;margin:14px 0}
+.detail .stats{background:transparent}
+.stats>div:not(.alert):not(.q1):not(.q2){display:flex;flex-direction:row-reverse;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border:0;border-radius:2px;color:#fff;background:linear-gradient(135deg,#4a4189,#2d6593);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.stats>div:not(.alert):not(.q1):not(.q2):nth-child(2){background:linear-gradient(135deg,#1f9fd8,#3b8de8)}
+.stats>div:not(.alert):not(.q1):not(.q2):nth-child(3){background:linear-gradient(135deg,#1aa860,#35c48b)}
+.stats>div:not(.alert):not(.q1):not(.q2):nth-child(4){background:linear-gradient(135deg,#e08a1e,#f0a93a)}
+.stats b,.stats b.green,.stats b.red,.stats b.amber{display:block;color:#fff;font-size:26px}
+.stats small{color:#fff;font-size:15px;font-weight:700}
+@media(max-width:900px){body{padding-left:0}header,body.admin header{height:auto;min-height:48px;flex-wrap:wrap;padding:0 12px}header::before,header::after{display:none}.brand,body.admin .brand{position:static;width:auto;height:48px;padding-right:12px;background:transparent}nav{position:static;width:auto;flex-direction:row;background:transparent;overflow:visible}nav::before{display:none}nav a,body.admin nav a{padding:8px 10px;border-left:0;border-radius:2px}.pagehead{padding:10px 14px}}
+ 
+body{font-size:15px;line-height:1.65;letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
+h1{font-size:22px;line-height:1.35;font-weight:700}
+.card h2{font-size:17px}
+h3{font-size:15.5px;margin:24px 0 10px}
+.lead{font-size:14.5px;line-height:1.6;color:var(--ink-2)}
+.hint{font-size:14px;line-height:1.65;margin:6px 0 16px}
+.small{font-size:13px}
+footer{font-size:13px}
+label{font-size:14.5px;font-weight:600;color:var(--ink)}
+input[type=text],input[type=number],input:not([type]),select,label input:not([type=file]):not([type=checkbox]){min-height:42px;font-size:15px;line-height:1.4}
+.primary,.secondary,.tiny{display:inline-flex;align-items:center;justify-content:center;font-size:14.5px;line-height:1.3}
+.tiny{font-size:13.5px}
+th,td{padding:11px 14px;vertical-align:middle;line-height:1.5;text-align:left}
+.tablewrap th{font-size:13.5px;letter-spacing:0}
+.mono{font-size:13.5px}
+.badge{font-size:13px;padding:2px 10px}
+.verdict-head b{font-size:15px}
+.vlegend{font-size:14px}
+.info{font-size:14px;line-height:1.75}
+.filepill{font-size:14.5px}
+.drop b{font-size:15.5px}
+.drop small{font-size:13.5px}
+.u042-st small{font-size:13.5px}
+.sidebtn{font-size:14.5px;font-weight:600}
+.stats b,.stats b.green,.stats b.red,.stats b.amber{font-size:28px;line-height:1.2}
+.stats small{font-size:15.5px}
+nav a,body.admin nav a{font-size:15px;line-height:1.4}
+nav::before{font-size:12.5px}
+header::before{font-size:15px}
+header::after{font-size:13px}
+@media(max-width:800px){body{font-size:14.5px}h1{font-size:20px}.card h2{font-size:16px}}
+ 
+header::before,header::after{position:absolute;top:0;margin:0;line-height:48px;white-space:nowrap}
+header::before{left:216px;text-align:left}
+header::after{right:20px}
+@media(max-width:900px){header::before,header::after{display:none}}
+ 
+header::before,body.admin header::before{content:none!important;display:none!important}
+ 
+h1{font-weight:700;line-height:1.35;letter-spacing:-.02em;margin:0}
+h2{font-weight:700;line-height:1.35;letter-spacing:-.015em}
+h3{font-weight:600;line-height:1.45;letter-spacing:-.01em;color:var(--ink)}
+.card h3{margin:28px 0 12px;padding-top:20px;border-top:1px solid var(--line)}
+.card .toolbar h3,.detail h3{margin-top:0;padding-top:0;border-top:0}
+.card h2+.hint{margin-top:8px}
+.lead{max-width:80ch;margin-top:4px}
+.hint{max-width:90ch;font-weight:400}
+.lead,.hint,.info,.alert,.small,.muted{word-break:keep-all;overflow-wrap:break-word}
+strong,b{font-weight:600}
+.mono,.num,th.num,td.num{letter-spacing:0;font-variant-numeric:tabular-nums}
+th.num,td.num{text-align:right}
+th{font-weight:600;letter-spacing:0;line-height:1.4}
+label{margin:18px 0 6px;line-height:1.5}
+label input:not([type=file]):not([type=checkbox]){margin-top:8px}
+.filepill{overflow-wrap:anywhere;line-height:1.5}
+.tablewrap td .small{white-space:normal;max-width:360px}
+.stack>*+*{margin-top:20px}
+.pagehead{margin-bottom:18px;gap:12px 32px}
+.card{padding:22px 24px}
+.intake{gap:48px}
+.intake>div{min-width:0}
+.submit-grid{gap:20px 28px}
+.actions{gap:10px;margin-top:20px}
+.toolbar{gap:16px;margin-bottom:16px}
+.view>.toolbar{padding-bottom:14px;border-bottom:1px solid var(--line)}
+.side{margin-bottom:16px}
+.stats{gap:16px;margin:16px 0}
+.info{padding:12px 16px;margin:18px 0}
+.alert{padding:12px 16px}
+.detail{padding:20px;margin-top:24px}
+.empty{padding:40px}
+th,td{padding:12px 16px}
+.tablewrap{margin-top:14px;max-height:520px}
+.tablewrap th{height:44px}
+.tablewrap td{border-bottom:1px solid #e6eaee}
+.tablewrap tbody tr:nth-child(even) td{background:#fafbfc}
+.tablewrap tbody tr:hover td{background:#eef6fb}
+.primary,.secondary,.tiny{min-height:40px;padding:8px 18px;font-weight:600}
+.tiny{min-height:32px;padding:4px 12px}
+.wide{min-height:46px;margin-top:10px}
+input[type=text],input[type=number],input:not([type]),select,label input:not([type=file]):not([type=checkbox]){padding:9px 12px}
+.drop{min-height:170px;gap:8px}
+.preview-card h2{margin-bottom:6px}
+nav a,body.admin nav a{min-height:46px;display:flex;align-items:center;border-bottom:1px solid #2c3944}
+footer{margin:36px 0 12px;padding-top:18px;border-top:1px solid #dfe3e7;line-height:1.6}
+@media(max-width:800px){.card{padding:18px}.stack>*+*{margin-top:14px}.intake{gap:28px}.view>.toolbar{padding-bottom:12px}nav a,body.admin nav a{min-height:40px;border-bottom:0}}
+ 
+.u042-steps{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:0;max-width:720px;margin:0 0 22px;padding:20px 0 0}
+.u042-line{position:absolute;left:0;right:0;top:0;height:8px;border-radius:4px;background:var(--line)}
+.u042-line i{border-radius:4px;transform:scaleX(calc(.3333 + var(--p,0) * .6667))}
+.u042-st{width:auto;flex-direction:row;align-items:center;gap:0}
+.u042-dot{display:none}
+.u042-st small{font-size:14px;font-weight:600;color:var(--muted)}
+.u042-st.cur small{color:var(--brand);font-weight:700}
+.u042-st.done small{color:var(--ink)}
+.u042-st.done small::before{content:"✓ ";color:var(--brand)}
+ 
+.pv-filter{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:14px 0 0}
+.pv-filter span{margin-right:6px;font-size:13.5px;font-weight:700;color:var(--ink-2)}
+.pv-filter button{padding:6px 14px;border:1px solid var(--line-2);border-radius:999px;background:#fff;color:var(--ink-2);font-size:13.5px;font-weight:600;cursor:pointer}
+.pv-filter button:hover{border-color:var(--brand);color:var(--brand)}
+.pv-filter button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.preview-card.pv-targets .excel-preview-table tbody tr:not(.row-match):not(.row-issue):not(.row-position-issue){display:none}
+.preview-card.pv-issues .excel-preview-table tbody tr:not(.row-issue):not(.row-position-issue){display:none}
+.curriculum-wrap{max-height:72vh;border-color:#cfd5da}
+.excel-preview-table tbody tr:hover{outline:2px solid rgba(47,135,182,.55);outline-offset:-2px}
+.excel-preview-table tbody tr:hover td.row-num{background:var(--brand-soft);color:var(--brand)}
+.excel-preview-table tr.row-issue td.row-num,.excel-preview-table tr.row-position-issue td.row-num{box-shadow:inset 4px 0 0 var(--bad)}
+.excel-preview-table tr.row-match td.row-num{box-shadow:inset 4px 0 0 var(--ok)}
+.preview-legend{padding:10px 14px;background:#f6f8fa;border:1px solid var(--line);border-radius:2px}
+.preview-tools{padding-top:10px;margin-top:12px;border-top:1px solid var(--line)}
+.preview-pages button,.preview-zoom-controls button{border-radius:2px;font-weight:600}
+.preview-tab{font-weight:600}
+.location-link{padding:2px 8px;border-radius:2px;background:var(--brand-soft);text-decoration:none;font-weight:600}
+.location-link:hover{background:var(--brand);color:#fff}
+ 
+.excel-preview-table td{font-size:14px!important;line-height:1.4!important;padding:6px 8px}
+.excel-preview-table th{font-size:13px;padding:7px 8px}
+.excel-preview-table .row-num{font-size:12.5px!important}
+.u042-line i{transform:scaleX(var(--p,0))!important}
+.submit-grid{align-items:start!important}
+.submit-grid label{display:flex!important;flex-direction:column;gap:6px;margin:0!important;font-size:14px!important;font-weight:700!important;line-height:1.4!important}
+.submit-grid label input{width:100%;height:42px;box-sizing:border-box;margin:0!important}
+.submit-grid>div:last-child{padding-top:26px}
+</style><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script></head><body>
+<header><div class="brand"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="9" height="9" rx="1.5"/><rect x="13" y="2" width="9" height="9" rx="1.5"/><rect x="2" y="13" width="9" height="9" rx="1.5"/><rect class="on" x="13" y="13" width="9" height="9" rx="1.5"/></svg><div>교육과정 <span>사전검증</span></div></div><nav><a class="active" href="upload.html">학과 업로드</a><a href="admin.html">부서 모니터링·관리</a></nav></header>
+<main>
+<div class="pagehead"><div><h1>교육과정표 사전 검증</h1><p class="lead">교육과정표를 올리면 원자료와 칸 단위로 대조합니다. 결과를 확인한 뒤 제출하세요.</p></div><p id="activeSource" class="source-status">적용 원자료를 확인하고 있습니다.</p></div>
+<ol class="u042-steps ux" id="stepper" aria-label="진행 단계"><li class="u042-line" aria-hidden="true"><i></i></li><li class="u042-st cur" data-step="1"><span class="u042-dot"><span>1</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.4"/></svg></span><small>파일 업로드</small></li><li class="u042-st" data-step="2"><span class="u042-dot"><span>2</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.4"/></svg></span><small>검증 결과</small></li><li class="u042-st" data-step="3"><span class="u042-dot"><span>3</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.4"/></svg></span><small>확인·제출</small></li></ol>
+<div class="stack">
+<section class="card intake">
+<div><h2>교육과정표 파일</h2><p class="hint">XLSX 파일을 선택하면 학년도와 과목 코드를 읽어 비교합니다.</p>
+<label class="drop u032-zone ux" id="dropZone"><svg class="u032-dash" aria-hidden="true"><rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx="5"/></svg><span class="u032-orb" aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M8.5 20.5H7a5 5 0 0 1-.6-10 7 7 0 0 1 13.4-1.6A5.5 5.5 0 0 1 21 20.5h-1.5M14 13v10M10.5 16.5L14 13l3.5 3.5"/></svg></span><b>엑셀 파일을 끌어다 놓으세요</b><small>.xlsx · 최대 10MB</small><span class="drop-btn">파일 찾아보기</span><input id="file" type="file" accept=".xlsx"></label>
+<div id="fileInfo"></div></div>
+<div class="intake-side"><h2>학과 정보</h2><p class="hint">검증 기록과 제출 이력에 남습니다.</p>
+<div id="formError" class="u244-sb ux" role="alert"><b>입력 내용을 확인해 주세요</b><ul id="formErrorList"></ul></div>
+<label class="u244-fd">학과명<input id="dept" placeholder="예: 뷰티아트과" value=""><span class="u244-ms">학과명을 입력해 주세요</span></label>
+<button id="check" class="primary wide" disabled>검증 실행</button></div>
+</section>
+<section class="card report-card"><div id="report"></div></section>
+<section id="stepSubmit" class="card hidden">
+<div class="submit-grid"><div><h2>확인·제출</h2><p class="hint">결과를 확인했다면 성명을 입력하고 작성을 완료하세요.</p></div>
+<label class="u244-fd">성명<input id="name" placeholder="성명을 입력하세요" autocomplete="name"><span class="u244-ms">성명을 입력해 주세요</span></label>
+<label>검증 확인 일시<input id="confirmed" value="제출 시 자동 기록" readonly></label>
+<div><button id="submit" class="primary wide" disabled>검증 확인 및 작성 완료</button><p class="small muted" style="margin:6px 0 0">확인 시각은 한국 시간으로 자동 기록됩니다.</p></div></div>
+<div id="success" class="success-box hidden"></div>
+</section>
+<div id="sheetPreview"></div>
+</div>
+<footer>교육과정 검증 · 과목코드와 원자료에 있는 상세 항목을 비교합니다.</footer>
+</main>
+<div id="reviewBar" class="u250-br ux" role="status"><span id="reviewText"></span><button type="button" class="u250-cx" id="reviewReset">취소</button><button type="button" class="u250-sv" id="reviewSubmit">제출</button></div><div id="toast" class="toast"></div>
+<script>
+let chosen=null, courses=[], year='', report=null, previewSheets=[], previewMode='rich', previewNotice='', activePreviewSheet=0, previewPageStart=0, previewZoom=1, previewZoomFit=false;
+const $=id=>document.getElementById(id);
+function msg(t){const x=$('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),3000)}
+function run(fn,args,ok){const r=google.script.run.withSuccessHandler(ok).withFailureHandler(e=>{msg(e.message||String(e));$('check').disabled=false;$('submit').disabled=false});r[fn](args)}
+$('file').onchange=()=>{chosen=$('file').files[0]||null;report=null;previewSheets=[];previewMode='rich';previewNotice='';activePreviewSheet=0;previewPageStart=0;previewZoom=1;previewZoomFit=false;$('submit').disabled=true;$('check').disabled=!chosen;$('report').innerHTML='';$('sheetPreview').innerHTML='';$('success').classList.add('hidden');$('stepSubmit').classList.add('hidden');syncBar();$('fileInfo').innerHTML=chosen?`<div class="filepill">${esc(chosen.name)} <span>${(chosen.size/1024).toFixed(1)} KB</span></div>`:''};
+$('check').onclick=async()=>{if(!chosen)return;if(!showErrors(['dept']))return;if(!window.XLSX){msg('엑셀 판독 라이브러리를 불러오지 못했습니다.');return}$('check').disabled=true;$('report').innerHTML='<p class="muted">파일을 읽고 있습니다…</p>';try{const buffer=await chosen.arrayBuffer();const wb=XLSX.read(buffer.slice(0),{type:'array'});const parsed=parseWorkbook(wb);courses=parsed.courses;year=parsed.year||'';try{previewSheets=await buildRichPreview(buffer);previewMode='rich';previewNotice='ExcelJS 4.4.0으로 셀 서식·병합·행 높이·열 너비를 재현했습니다. 브라우저 글꼴·인쇄 렌더링은 Excel과 차이가 있을 수 있습니다.'}catch(previewError){previewSheets=buildBasicPreview(parsed.sheets);previewMode='basic';previewNotice='서식 미리보기 라이브러리를 불러오지 못해 값 중심 표로 표시합니다. 병합·서식 재현은 확인되지 않았습니다.'}if(!courses.length)throw Error('현재 양식에서 과목 코드 열(E)의 데이터를 찾지 못했습니다.');if(!year)throw Error('교육과정표에서 학년도를 찾지 못했습니다. 부서 기준 연도를 확인해 주세요.');const dept=$('dept').value.trim();if(!dept)throw Error('학과명을 먼저 입력해 주세요.');run('apiValidate',{department:dept,academicYear:year,courses},res=>{report=res;draw(res);$('check').disabled=false;$('submit').disabled=false;setStep(2);syncBar()})}catch(e){$('report').innerHTML=`<div class="alert">${esc(e.message)}</div>`;$('check').disabled=false}};
+function hasLoadValue(v){if(v===null||v===undefined)return false;const s=String(v).trim();if(!s)return false;const n=Number(s.replace(/,/g,''));return Number.isFinite(n)?n!==0:true}
+function parseWorkbook(wb){let cs=[],years=new Set(),sheets=[];const blocks=[{grade:1,semester:1,start:10,end:12,first:'K',last:'M'},{grade:1,semester:2,start:13,end:15,first:'N',last:'P'},{grade:2,semester:1,start:16,end:18,first:'Q',last:'S'},{grade:2,semester:2,start:19,end:21,first:'T',last:'V'}];wb.SheetNames.forEach(sn=>{const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:null,raw:true});sheets.push({name:sn,rows,totalRows:rows.length});let area='';rows.forEach((r,i)=>{const areaCell=String(r[1]||'').trim();if(areaCell==='교양'||areaCell==='전공')area=areaCell;else if(areaCell)area='';r.forEach(v=>{const m=String(v||'').match(/(20\d{2})\s*학년도/);if(m)years.add(m[1])});if(i<8)return;const raw=r[4];if(raw===null||raw===undefined||String(raw).trim()==='')return;const code=norm(raw);if(!/^[A-Z0-9]{5,}$/.test(code))return;const rowNo=i+1;const placements=blocks.filter(b=>r.slice(b.start,b.end+1).some(hasLoadValue)).map(b=>({grade:b.grade,semester:b.semester,cellRange:b.first+rowNo+':'+b.last+rowNo}));cs.push({sheet:sn,row:rowNo,codeCell:'E'+rowNo,code,name:String(r[5]||'').trim(),completionType:area&&/^(필수|선택)$/.test(String(r[3]||'').trim())?area+String(r[3]).trim():'',credit:r[22]===null||r[22]===undefined?'':String(r[22]).trim(),theoryHours:r[23]===null||r[23]===undefined?'':String(r[23]).trim(),practiceHours:r[24]===null||r[24]===undefined?'':String(r[24]).trim(),placements})})});return{courses:cs,year:[...years].sort().pop()||'',sheets}}
+function loadExcelJS(){return new Promise((resolve,reject)=>{if(window.ExcelJS)return resolve();const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';s.onload=()=>window.ExcelJS?resolve():reject(new Error('ExcelJS를 초기화하지 못했습니다.'));s.onerror=()=>reject(new Error('ExcelJS CDN을 불러오지 못했습니다.'));document.head.appendChild(s)})}
+function excelColNo(label){let n=0;for(const c of String(label).toUpperCase())n=n*26+c.charCodeAt(0)-64;return n}
+function parseMergeRange(ref){const m=String(ref).match(/^([A-Z]+)(\d+):([A-Z]+)(\d+)$/i);if(!m)return null;return{top:Number(m[2]),left:excelColNo(m[1]),bottom:Number(m[4]),right:excelColNo(m[3])}}
+function colorHex(color){if(!color)return'';const themes=['#FFFFFF','#000000','#E7E6E6','#44546A','#4472C4','#ED7D31','#A5A5A5','#FFC000','#5B9BD5','#70AD47'];let h=String(color.argb||color.rgb||'').replace(/^#/,'');if(!/^[0-9a-f]{6,8}$/i.test(h)){if(Number.isInteger(color.theme)&&themes[color.theme])h=themes[color.theme].slice(1);else return''}else h=h.slice(-6);let rgb=[0,2,4].map(i=>parseInt(h.slice(i,i+2),16));const tint=Number(color.tint)||0;if(tint)rgb=rgb.map(v=>Math.max(0,Math.min(255,Math.round(tint<0?v*(1+tint):v+(255-v)*tint))));return'#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join('')}
+function safeCellCss(style){style=style||{};const css=[],font=style.font||{},fill=style.fill||{},align=style.alignment||{},border=style.border||{};if(font.bold)css.push('font-weight:700');if(font.italic)css.push('font-style:italic');if(font.underline||font.strike)css.push('text-decoration:'+(font.underline?'underline':'')+(font.underline&&font.strike?' ':'')+(font.strike?'line-through':''));if(font.size&&Number(font.size)>=6&&Number(font.size)<=72)css.push('font-size:'+Number(font.size)+'pt');if(font.name&&/^[\w -]{1,40}$/.test(font.name))css.push('font-family:"'+font.name+'"');const fc=colorHex(font.color);if(fc)css.push('color:'+fc);if(fill.type==='pattern'&&fill.pattern==='solid'){const bg=colorHex(fill.fgColor||fill.bgColor);if(bg)css.push('background-color:'+bg)}const h={left:'left',center:'center',right:'right',justify:'justify',distributed:'justify'}[align.horizontal];if(h)css.push('text-align:'+h);const v={top:'top',middle:'middle',center:'middle',bottom:'bottom'}[align.vertical];if(v)css.push('vertical-align:'+v);if(align.wrapText)css.push('white-space:pre-wrap','overflow-wrap:anywhere');if(align.shrinkToFit)css.push('font-size:90%');const styles={thin:['1px','solid'],hair:['1px','dotted'],dotted:['1px','dotted'],dashed:['1px','dashed'],dashDot:['1px','dashed'],medium:['2px','solid'],mediumDashed:['2px','dashed'],thick:['3px','solid'],double:['3px','double']};for(const side of ['top','right','bottom','left']){const b=border[side];if(!b||!styles[b.style])continue;const [width,line]=styles[b.style],col=colorHex(b.color)||'#6B7280';css.push('border-'+side+':'+width+' '+line+' '+col)}return css.join(';')}
+function calcFormula(ws,f,d){if(d>8)return NaN;var col=function(s){var n=0;for(var i=0;i<s.length;i++)n=n*26+s.charCodeAt(i)-64;return n};var cv=function(r,c){var x=ws.getCell(r,c).value;if(x&&typeof x==="object"&&!Array.isArray(x.richText)){if(x.result!==undefined)x=x.result;else if(x.formula)x=calcFormula(ws,x.formula,d+1);else x=0}var n=Number(x);return isNaN(n)?0:n};var e=String(f).replace(/\$/g,"").replace(/SUM\(([^()]*)\)/gi,function(m,a){var t=0;a.split(",").forEach(function(p){var q=p.trim().match(/^([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$/i);if(!q){t+=Number(p)||0;return}var c1=col(q[1].toUpperCase()),r1=+q[2],c2=q[3]?col(q[3].toUpperCase()):c1,r2=q[4]?+q[4]:r1;for(var r=Math.min(r1,r2);r<=Math.max(r1,r2);r++)for(var c=Math.min(c1,c2);c<=Math.max(c1,c2);c++)t+=cv(r,c)});return String(t)}).replace(/([A-Z]+)(\d+)/gi,function(m,a,b){return String(cv(+b,col(a.toUpperCase())))});if(!/^[0-9+\-*\/().\s]*$/.test(e))return NaN;try{return Function("return("+e+")")()}catch(err){return NaN}}
+function previewCellText(cell){const v=cell.value;if(v===null||v===undefined)return'';if(cell.text!==undefined&&cell.text!=='')return String(cell.text);if(typeof v==='object'){if(Array.isArray(v.richText))return v.richText.map(x=>x.text||'').join('');if(v.text)return String(v.text);if(v.result!==undefined)return String(v.result);if(v.formula){var fr=calcFormula(cell.worksheet,v.formula,0);return isNaN(fr)?'':String(Math.round(fr*100)/100)}return''}return String(v)}
+async function buildRichPreview(buffer){await loadExcelJS();const book=new ExcelJS.Workbook();await book.xlsx.load(buffer.slice(0));return book.worksheets.map(ws=>{const totalRows=Math.max(1,ws.rowCount||1),totalColumns=Math.max(1,ws.columnCount||1),displayRows=Math.min(totalRows,1500),displayColumns=totalColumns;const columns=Array.from({length:displayColumns},(_,i)=>{const c=ws.getColumn(i+1),px=Math.max(28,Math.min(420,Math.round((Number(c.width)||8.43)*7+5)));return{width:px,hidden:!!c.hidden}});const rows=Array.from({length:displayRows},(_,i)=>{const row=ws.getRow(i+1);return{height:row.height?Math.max(12,Math.round(row.height*4/3)):null,hidden:!!row.hidden,cells:Array.from({length:displayColumns},(_,j)=>{const cell=ws.getCell(i+1,j+1);return{text:previewCellText(cell),style:cell.style||{}}})}});const merges=(ws.model&&ws.model.merges||[]).map(parseMergeRange).filter(m=>m&&m.top<=displayRows&&m.left<=displayColumns);return{name:ws.name,hidden:ws.state&&ws.state!=='visible',totalRows,totalColumns,columns,rows,merges,truncated:totalRows>displayRows||totalColumns>displayColumns}})}
+function buildBasicPreview(sheets){return(sheets||[]).map(s=>{const totalColumns=Math.max(1,...s.rows.map(r=>r?r.length:0)),displayColumns=totalColumns;return{name:s.name,totalRows:s.totalRows,totalColumns,columns:[],merges:[],rows:s.rows.slice(0,1500).map(row=>({height:null,hidden:false,cells:Array.from({length:displayColumns},(_,i)=>({text:row&&row[i]!=null?String(row[i]):'',style:{}}))})),truncated:s.totalRows>1500||totalColumns>displayColumns,hidden:false}})}
+function termLabel(term){const m=String(term||'').match(/^(\d+)-(\d+)$/);return m?`${m[1]}학년 ${m[2]}학기`:String(term||'')}
+function termList(terms){return(terms||[]).map(termLabel).join(', ')||'—'}
+function placementBadgeClass(status){if(status==='위치 일치')return'ok';if(status==='위치 불일치')return'bad';return'warn'}
+function verdict(title,segs,sub){const sum=segs.reduce((a,b)=>a+b.n,0);return`<div class="verdict"><div class="verdict-head"><b>${title}</b><span class="small muted">${esc(sub||'')}</span></div><div class="vbar" role="img" aria-label="${esc(title)}: ${segs.map(g=>g.t+' '+g.n+'건').join(', ')}">${sum?segs.filter(g=>g.n>0).map(g=>`<i class="${g.c}" style="flex:${g.n}"></i>`).join(''):''}</div><ul class="vlegend">${segs.map(g=>`<li class="${g.c}${g.n?'':' zero'}"><b>${g.n}</b>${g.t}</li>`).join('')}</ul></div>`}
+function draw(r){const s=r.summary;const rows=r.courses.slice(0,250).map(x=>{const sheetIndex=previewSheets.findIndex(sh=>sh.name===x.sheet);const fieldText=(x.detailMismatches||[]).map(f=>`${f.field}: ${f.expected} → ${f.actual}`).join(' · ');return`<tr><td><button type="button" class="location-link" data-sheet-index="${sheetIndex}" data-row="${x.row}" data-cell="${esc(x.curriculumCell||`${x.sheet}!E${x.row}`)}">${esc(x.curriculumCell||`${x.sheet}!E${x.row}`)}</button></td><td class="mono">${esc(x.code)}</td><td>${esc(x.name)}</td><td><span class="badge ${x.ok?'ok':'bad'}">${esc(x.status)}</span></td><td><span class="badge ${x.detailStatus==='상세정보 일치'?'ok':x.detailStatus==='상세정보 불일치'?'bad':'warn'}">${esc(x.detailStatus)}</span><div class="small muted">${esc(fieldText)}</div></td><td class="mono">${esc(x.sourceCell)}</td></tr>`}).join('');$('stepSubmit').classList.remove('hidden');$('report').innerHTML=`<div class="sec-head"><h2>검증 결과</h2><p class="hint">원자료와 대조한 결과입니다. 표의 위치를 누르면 아래 미리보기의 해당 행으로 이동합니다.</p></div><div class="verdicts">${verdict('코드 검증',[{n:s.matched,c:'ok',t:'일치'},{n:s.unmatched,c:'bad',t:'원자료에 없는 코드'}],s.courseRows+'개 과목')}${verdict('상세정보 검증',[{n:s.detailMatched||0,c:'ok',t:'일치'},{n:s.detailMismatch||0,c:'bad',t:'불일치'},{n:s.detailUnavailable||0,c:'warn',t:'비교 불가'}],s.detailRetired?'폐지 과목 '+s.detailRetired+'건 확인':'')}</div><div class="info"><strong>적용 원자료</strong>${esc(r.sourceImportedAt||'')} · ${esc(r.sourceFileName||'')} · ${r.sourceRows}행<br><strong>상세 검증 조건</strong>${esc(r.ruleSummary||'')}</div><div class="tablewrap"><table><thead><tr><th>교육과정표 위치</th><th>교과목 코드</th><th>과목명</th><th>코드 검증</th><th>상세정보 검증</th><th>원자료 위치</th></tr></thead><tbody>${rows}</tbody></table></div>${r.courses.length>250?`<p class="small muted">검증 결과는 앞 250건까지 표시합니다. 아래 표에는 전체 검증 위치가 색상으로 표시됩니다.</p>`:''}`;$('sheetPreview').innerHTML=`<section class="card preview-card"><h2>업로드한 교육과정표 미리보기</h2><p class="preview-note">검증 결과의 교육과정표 위치를 누르면 해당 시트와 행으로 이동합니다. 초록색은 코드와 상세정보 일치, 빨간색은 코드 누락 또는 상세정보 불일치입니다. 학년·학기 배치는 원자료에 기준 정보가 없어 비교하지 않습니다.</p><div class="preview-fidelity-note">${esc(previewNotice||'')}</div><div class="preview-legend"><span class="legend-chip"><i class="legend-dot dot-match"></i>코드 또는 상세정보 일치</span><span class="legend-chip"><i class="legend-dot dot-issue"></i>코드 누락 / 상세정보 불일치</span><span class="legend-chip">브라우저 렌더링은 Excel과 완전히 동일하지 않을 수 있습니다.</span></div><div id="previewTabs" class="preview-tabs"></div><div id="previewContent"></div></section>`;$('previewTabs').innerHTML=previewSheets.map((sh,i)=>`<button type="button" class="preview-tab ${i===0?'active':''}" data-preview-sheet="${i}">${esc(sh.name)}${sh.hidden?' · 숨김':''}</button>`).join('');document.querySelectorAll('.preview-tab').forEach(btn=>btn.addEventListener('click',()=>renderSheetPreview(Number(btn.dataset.previewSheet),1)));document.querySelectorAll('.location-link').forEach(btn=>btn.addEventListener('click',()=>renderSheetPreview(Number(btn.dataset.sheetIndex),Number(btn.dataset.row),true)));activePreviewSheet=0;previewPageStart=0;renderSheetPreview(0,1)}
+function previewColumnCount(sheet){return Math.max(1,Number(sheet.totalColumns)||0,(sheet.columns||[]).length)}
+function curriculumFieldColumn(field){return({'과목명':5,'이수구분':3,'학점':22,'이론시수':23,'실습시수':24})[String(field||'')]??-1}
+function clampPreviewZoom(value){const n=Number(value);return Math.max(.3,Math.min(3,Math.round((Number.isFinite(n)?n:1)*100)/100))}
+function fitPreviewScale(containerWidth,tableWidth){const cw=Number(containerWidth),tw=Number(tableWidth);if(!Number.isFinite(cw)||!Number.isFinite(tw)||cw<=0||tw<=0)return 1;return clampPreviewZoom(cw/tw)}
+function applyPreviewZoom(){const table=document.querySelector('#previewTableWrap .excel-preview-table');if(table)table.style.zoom=String(previewZoom);const label=$('previewZoomLabel');if(label)label.textContent=Math.round(previewZoom*100)+'%'}
+function fitPreviewToWidth(){const wrap=$('previewTableWrap'),table=wrap&&wrap.querySelector('.excel-preview-table');if(!wrap||!table)return;table.style.zoom='1';const baseWidth=table.getBoundingClientRect().width;previewZoom=fitPreviewScale(wrap.clientWidth,baseWidth);previewZoomFit=true;applyPreviewZoom()}
+function setPreviewZoom(value){previewZoom=clampPreviewZoom(value);previewZoomFit=false;applyPreviewZoom()}
+function columnLabel(index){let n=index+1,label='';while(n){const r=(n-1)%26;label=String.fromCharCode(65+r)+label;n=Math.floor((n-1)/26)}return label}
+function renderSheetPreview(sheetIndex=activePreviewSheet,targetRow=1,scrollToTarget=false){const sheet=previewSheets[sheetIndex];if(!sheet)return;activePreviewSheet=sheetIndex;const pageSize=200,total=sheet.rows.length,allRows=sheet.totalRows||total,start=targetRow?Math.floor((targetRow-1)/pageSize)*pageSize:Math.min(previewPageStart,Math.max(0,total-pageSize)),end=Math.min(total,start+pageSize);previewPageStart=start;document.querySelectorAll('.preview-tab').forEach((btn,i)=>btn.classList.toggle('active',i===sheetIndex));const colCount=previewColumnCount(sheet),byRow=new Map((report?.courses||[]).filter(x=>x.sheet===sheet.name).map(x=>[x.row,x])),mergeStarts=new Map(),mergeCovered=new Set();(sheet.merges||[]).forEach(m=>{if(m.top<start+1||m.top>end||m.left>colCount)return;mergeStarts.set(m.top+':'+m.left,m);for(let r=m.top;r<=Math.min(m.bottom,end);r++)for(let c=m.left;c<=Math.min(m.right,colCount);c++)if(r!==m.top||c!==m.left)mergeCovered.add(r+':'+c)});const colgroup=`<colgroup><col style="width:36px;min-width:36px">${Array.from({length:colCount},(_,i)=>{const c=sheet.columns&&sheet.columns[i],w=c&&c.width?c.width:64;return`<col style="width:${w}px;min-width:${w}px;${c&&c.hidden?'display:none':''}">`}).join('')}</colgroup>`;const header=`<thead><tr><th class="row-num">행</th>${Array.from({length:colCount},(_,i)=>`<th data-preview-column="${i+1}" class="${i===4?'col-code':''}">${columnLabel(i)}${i===4?' · 코드':''}</th>`).join('')}</tr></thead>`;const body=sheet.rows.slice(start,end).map((row,offset)=>{const rowNo=start+offset+1,result=byRow.get(rowNo),trClass=result&&!result.ok?'row-issue':result&&result.placementStatus==='위치 불일치'?'row-position-issue':result?'row-match':'',height=row&&row.height?'height:'+row.height+'px;':'',hidden=row&&row.hidden?'display:none;':'';const cells=Array.from({length:colCount},(_,col)=>{const colNo=col+1,key=rowNo+':'+colNo;if(mergeCovered.has(key))return'';const item=row&&row.cells?row.cells[col]:null,text=item&&item.text!=null?String(item.text):'';let mark='',detailField=null;if(result&&col===4)mark=result.ok?'cell-match':'cell-issue';else if(result){detailField=(result.detailFields||[]).find(f=>curriculumFieldColumn(f.field)===col);if(detailField)mark=detailField.status==='일치'?'cell-match':'cell-issue'}const cls=[col===4?'col-code':'',mark].filter(Boolean).join(' '),title=col===4&&result?`${result.status} · ${result.sourceCell}`:detailField?`${detailField.field} · ${detailField.status}`:'',merge=mergeStarts.get(key),span=merge?` rowspan="${merge.bottom-merge.top+1}" colspan="${merge.right-merge.left+1}"`:'';return`<td data-preview-column="${colNo}" class="${cls}"${span} style="${safeCellCss(item&&item.style)}" title="${esc(title)}">${esc(text)}</td>`}).join('');return`<tr id="preview-row-${sheetIndex}-${rowNo}" class="${trClass}" style="${height}${hidden}"><td class="row-num">${rowNo}</td>${cells}</tr>`}).join('');const prev=start>0?Math.max(0,start-pageSize):0,next=end<total?end:total,jumpCount=byRow.size;$('previewContent').innerHTML=`<div class="preview-tools"><span>${esc(sheet.name)} · ${total?start+1:0}–${end}행 / 총 ${allRows}행 · 검증 코드 ${jumpCount}건</span><div class="preview-pages"><button type="button" data-page-start="${prev}" ${start===0?'disabled':''}>이전</button><button type="button" data-page-start="${next}" ${end>=total?'disabled':''}>다음</button></div></div><div class="preview-zoom-controls" role="group" aria-label="미리보기 크기 조절"><span>표 크기</span><button type="button" id="previewZoomOut" aria-label="축소" title="축소">−</button><output id="previewZoomLabel" aria-live="polite">${Math.round(previewZoom*100)}%</output><button type="button" id="previewZoomIn" aria-label="확대" title="확대">+</button><button type="button" id="previewZoomFit" class="zoom-fit">화면 너비에 맞춤</button><button type="button" id="previewZoomReset">100%</button></div><div id="previewTableWrap" class="curriculum-wrap"><table class="excel-preview-table">${colgroup}${header}<tbody>${body}</tbody></table></div>${sheet.truncated?'<p class="small muted">화면 표시 한도에 따라 일부 행 또는 열만 표시합니다.</p>':''}${end<total?'<p class="small muted">행이 많아 200행씩 나누어 표시합니다. 위치 목록을 누르면 해당 행으로 이동합니다.</p>':''}`;document.querySelectorAll('[data-page-start]').forEach(btn=>btn.addEventListener('click',()=>{previewPageStart=Number(btn.dataset.pageStart);renderSheetPreview(sheetIndex,0)}));$('previewZoomOut').onclick=()=>setPreviewZoom(previewZoom-.25);$('previewZoomIn').onclick=()=>setPreviewZoom(previewZoom+.25);$('previewZoomFit').onclick=fitPreviewToWidth;$('previewZoomReset').onclick=()=>setPreviewZoom(1);if(previewZoomFit)fitPreviewToWidth();else applyPreviewZoom();if(scrollToTarget){const rowEl=$(`preview-row-${sheetIndex}-${targetRow}`),wrap=$('previewTableWrap');if(rowEl)rowEl.scrollIntoView({block:'center',behavior:'smooth'});if(wrap)wrap.scrollTo({left:0,behavior:'smooth'})}}
+window.addEventListener('resize',()=>{if(previewZoomFit)fitPreviewToWidth()});
+$('submit').onclick=async()=>{const dept=$('dept').value.trim(),name=$('name').value.trim();if(!report||!chosen)return;if(!showErrors(['dept','name']))return;if(chosen.size>10*1024*1024){msg('10MB 이하 파일만 제출할 수 있습니다.');return}$('submit').disabled=true;try{const data=await toBase64(chosen);run('apiSubmit',{department:dept,name,academicYear:year,sourceId:report.sourceId,courses,file:{name:chosen.name,data}},res=>{$('confirmed').value=res.confirmedAt;$('success').classList.remove('hidden');setStep(3,true);syncBar();$('success').innerHTML=`<h2>제출이 완료되었습니다 · 상세정보 일치 ${res.summary.detailMatched||0}건 / 불일치 ${res.summary.detailMismatch||0}건 / 비교 불가 ${res.summary.detailUnavailable||0}건</h2><p>${esc(dept)} · ${esc(name)} · ${esc(res.confirmedAt)}</p><p>${esc(res.fileName)} · 일치 ${res.summary.matched}건 / 불일치 ${res.summary.unmatched}건</p><p class="small">부서 모니터링 페이지에서 제출 파일과 당시 검증 결과를 확인할 수 있습니다.</p>`;msg('검증 확인 및 작성 완료');$('submit').disabled=false})}catch(e){msg(e.message);$('submit').disabled=false}};
+function toBase64(file){return new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(String(fr.result).split(',')[1]);fr.onerror=reject;fr.readAsDataURL(file)})}
+let activeSourceId='', latestSourceId='';
+function loadActive(){google.script.run.withSuccessHandler(a=>{const el=$('activeSource');if(!a){activeSourceId='';latestSourceId='';el.textContent='적용 중인 원자료가 없습니다. 관리자가 원자료를 등록해야 검증할 수 있습니다.';syncBar();return}const stale=!!(report&&report.sourceId!==a.sourceId);el.textContent='적용 원자료: '+a.importedAt+' · '+a.fileName+' · '+a.rowCount+'행 (확인 '+new Date().toLocaleTimeString('ko-KR')+')'+(stale?' · 검증 결과가 이전 원자료 기준입니다. 다시 검증해 주세요.':'');if(stale&&activeSourceId!==a.sourceId)msg('원자료가 갱신되었습니다. 검증을 다시 실행해 주세요.');activeSourceId=a.sourceId;latestSourceId=a.sourceId;syncBar()}).withFailureHandler(()=>{}).apiActiveSource()}
+loadActive();setInterval(loadActive,60000);
+
+const FIELD_MSG={dept:'학과명을 입력해 주세요',name:'성명을 입력해 주세요'};
+function showErrors(keys){
+  const bad=keys.filter(k=>!$(k).value.trim());
+  ['dept','name'].forEach(k=>{const f=$(k).closest('.u244-fd');if(f)f.classList.toggle('is-bad',bad.includes(k))});
+  const box=$('formError');
+  if(!bad.length){box.classList.remove('is-on');return true}
+  $('formErrorList').innerHTML=bad.map(k=>'<li><a href="#" data-focus="'+k+'">'+FIELD_MSG[k]+'</a></li>').join('');
+  box.classList.add('is-on');
+  bad.forEach(k=>{const f=$(k).closest('.u244-fd');f.classList.remove('u244-shake');void f.offsetWidth;f.classList.add('u244-shake')});
+  $(bad[0]).scrollIntoView({block:'center',behavior:'smooth'});
+  $(bad[0]).focus({preventScroll:true});
+  return false;
+}
+$('formErrorList').addEventListener('click',e=>{const a=e.target.closest('[data-focus]');if(!a)return;e.preventDefault();$(a.dataset.focus).focus()});
+['dept','name'].forEach(k=>$(k).addEventListener('input',()=>{
+  if($(k).value.trim())$(k).closest('.u244-fd').classList.remove('is-bad');
+  const any=['dept','name'].some(j=>$(j).closest('.u244-fd').classList.contains('is-bad'));
+  if(!any)$('formError').classList.remove('is-on');
+}));
+
+function setStep(n,finished){
+  const steps=[...document.querySelectorAll('#stepper .u042-st')];
+  steps.forEach((li,i)=>{li.classList.toggle('done',!!(i<n-1||(finished&&i===n-1)));li.classList.toggle('cur',i===n-1);if(i===n-1)li.setAttribute('aria-current','step');else li.removeAttribute('aria-current')});
+  $('stepper').style.setProperty('--p',((n-1)/(steps.length-1)).toFixed(3));
+}
+setStep(1);
+
+function syncBar(){
+  const bar=$('reviewBar');
+  const show=!!report&&$('success').classList.contains('hidden');
+  bar.classList.toggle('is-on',show);
+  if(!show)return;
+  const stale=!!latestSourceId&&report.sourceId!==latestSourceId;
+  bar.classList.toggle('is-warn',stale);
+  const s=report.summary;
+  $('reviewText').textContent=stale?'원자료가 갱신됐어요. 다시 검증해 주세요':'검증 완료 · 코드 일치 '+s.matched+'건 · 상세정보 불일치 '+(s.detailMismatch||0)+'건';
+  $('reviewSubmit').disabled=stale||$('submit').disabled;
+}
+$('reviewReset').onclick=()=>{$('file').value='';$('file').dispatchEvent(new Event('change'))};
+$('reviewSubmit').onclick=()=>{if(!$('reviewSubmit').disabled)$('submit').click()};
+
+(function(){
+  const dz=$('dropZone');let depth=0;
+  dz.addEventListener('dragenter',e=>{e.preventDefault();depth++;dz.classList.add('is-over')});
+  dz.addEventListener('dragover',e=>{e.preventDefault()});
+  dz.addEventListener('dragleave',()=>{depth=Math.max(0,depth-1);if(!depth)dz.classList.remove('is-over')});
+  dz.addEventListener('drop',e=>{
+    e.preventDefault();depth=0;dz.classList.remove('is-over');
+    const files=e.dataTransfer&&e.dataTransfer.files;if(!files||!files.length)return;
+    if(!/\.xlsx$/i.test(files[0].name)){msg('XLSX 파일만 올릴 수 있습니다.');return}
+    const inp=$('file');inp.files=files;inp.dispatchEvent(new Event('change'));
+  });
+})();
+function norm(v){return String(v).trim().toUpperCase().replace(/\s+/g,'')}function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+;(function(){const host=document.getElementById('sheetPreview');if(!host)return;let mode='all';function apply(){const card=host.querySelector('.preview-card');if(!card)return;card.classList.remove('pv-targets','pv-issues');if(mode==='targets')card.classList.add('pv-targets');if(mode==='issues')card.classList.add('pv-issues');card.querySelectorAll('.pv-filter button').forEach(b=>b.classList.toggle('on',b.dataset.mode===mode))}function inject(){const card=host.querySelector('.preview-card');if(!card||card.querySelector('.pv-filter'))return;const bar=document.createElement('div');bar.className='pv-filter';const sp=document.createElement('span');sp.textContent='보기';bar.appendChild(sp);[['all','전체 행'],['targets','검증 대상 행만'],['issues','불일치 행만']].forEach(([m,t])=>{const b=document.createElement('button');b.type='button';b.dataset.mode=m;b.textContent=t;bar.appendChild(b)});bar.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.mode;apply()});const tabs=card.querySelector('#previewTabs');if(tabs)card.insertBefore(bar,tabs);else card.appendChild(bar);apply()}new MutationObserver(inject).observe(host,{childList:true,subtree:true});inject()})();
+(function(){var bar=document.getElementById("reviewBar"),st=document.getElementById("stepper");if(!bar||!st)return;var css=document.createElement("style");css.textContent=".rb-prog{position:fixed;z-index:49;display:none;box-sizing:border-box;padding:8px 18px 6px}.rb-prog.on{display:block}.rb-track{height:4px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden}.rb-track i{display:block;height:100%;background:#7cc4ee;transform-origin:left;transform:scaleX(var(--p,0));transition:transform .4s}.rb-lab{display:flex;justify-content:space-between;margin-top:5px;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.6)}.rb-lab .cur{color:#fff}.rb-lab .done{color:#9ad6f5}";document.head.appendChild(css);var m=document.createElement("div");m.className="rb-prog";m.innerHTML="<div class='rb-track'><i></i></div><div class='rb-lab'><span>1 파일 업로드</span><span>2 검증 결과</span><span>3 확인·제출</span></div>";document.body.appendChild(m);var sp=m.querySelectorAll(".rb-lab span"),seen=true;function place(){var r=bar.getBoundingClientRect(),c=getComputedStyle(bar);m.style.left=r.left+"px";m.style.width=r.width+"px";m.style.bottom=(window.innerHeight-r.top)+"px";m.style.background=c.backgroundColor;m.style.borderRadius=c.borderTopLeftRadius+" "+c.borderTopRightRadius+" 0 0"}function sync(){m.style.setProperty("--p",st.style.getPropertyValue("--p")||"0");var li=st.querySelectorAll(".u042-st");for(var i=0;i<sp.length;i++){sp[i].className=li[i]?(li[i].classList.contains("done")?"done":li[i].classList.contains("cur")?"cur":""):""}var show=bar.classList.contains("is-on")&&!seen;m.classList.toggle("on",show);if(show)place()}new IntersectionObserver(function(es){seen=es[0].isIntersecting;sync()},{rootMargin:"-56px 0px 0px 0px"}).observe(st);new MutationObserver(sync).observe(st,{attributes:true,subtree:true,attributeFilter:["class","style"]});new MutationObserver(function(){sync();setTimeout(sync,350)}).observe(bar,{attributes:true,attributeFilter:["class"]});window.addEventListener("resize",sync);sync()})();</script></body></html>
